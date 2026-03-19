@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vågagenten · Ringenäs & Tylösand</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e14;--bg2:#0f1720;--bg3:#141e2b;--card:#162030;--card2:#1b2840;
+  --border:#1e2e42;--border2:#2a3e58;
+  --acc:#00c8ff;--green:#1fdb78;--yel:#f5c53a;--ora:#ff7b2e;--red:#ff3535;
+  --text:#ddeaf8;--muted:#5f7d99;--dim:#2e4560;
+  --f1:'Barlow Condensed',sans-serif;--f2:'Barlow',sans-serif;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:var(--f2);color:var(--text)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+
+/* ══ NAV ══ */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(10,14,20,.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  height:54px;display:flex;align-items:center;padding:0 20px;gap:20px;
+}
+.logo{font-family:var(--f1);font-size:21px;font-weight:900;letter-spacing:.1em;color:#fff;flex-shrink:0}
+.logo em{color:var(--acc);font-style:normal}
+.spot-tabs{display:flex;gap:0;flex:1}
+.stab{
+  padding:0 24px;height:54px;display:flex;align-items:center;
+  font-family:var(--f1);font-size:16px;font-weight:700;letter-spacing:.07em;
+  cursor:pointer;border:none;background:transparent;color:var(--muted);
+  border-bottom:3px solid transparent;transition:all .18s;
+}
+.stab:hover{color:var(--text)}
+.stab.on{color:#fff;border-bottom-color:var(--acc)}
+.live-badge{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--f1);font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--green)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:livepulse 1.6s ease-in-out infinite}
+
+/* ══ HERO ══ */
+#hero{
+  background:linear-gradient(180deg,#0c1c30 0%,var(--bg2) 100%);
+  border-bottom:1px solid var(--border);
+  padding:26px 20px 0;
+  animation:fadeUp .5s ease both;
+}
+.hero-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:22px}
+.hero-left{}
+.spot-name{font-family:var(--f1);font-size:46px;font-weight:900;letter-spacing:.05em;color:#fff;line-height:1;text-transform:uppercase}
+.spot-meta{font-size:13px;color:var(--muted);margin-top:5px}
+.spot-meta b{color:var(--text);font-weight:500}
+.hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.rating-wrap{text-align:center}
+.rating-cap{font-family:var(--f1);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.stars{display:flex;gap:2px;justify-content:center;margin-bottom:4px}
+.star-svg{width:16px;height:16px}
+.rating-word{font-family:var(--f1);font-size:18px;font-weight:800;letter-spacing:.06em}
+.now-stats{display:flex;gap:14px;flex-wrap:wrap}
+.nstat{text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.nstat-val{font-family:var(--f1);font-size:28px;font-weight:800;color:#fff;line-height:1}
+.nstat-lbl{font-size:10px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-family:var(--f1);margin-top:2px}
+
+/* ══ DAY STRIP ══ */
+#daystrip{display:flex;border-top:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+#daystrip::-webkit-scrollbar{display:none}
+.dtab{
+  flex:1;min-width:100px;padding:13px 10px 11px;text-align:center;
+  border-right:1px solid var(--border);cursor:pointer;transition:background .15s;
+  position:relative;
+}
+.dtab:hover{background:rgba(255,255,255,.03)}
+.dtab.on{background:var(--bg3)}
+.dtab.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--acc)}
+.dtab-name{font-family:var(--f1);font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.dtab.on .dtab-name{color:var(--text)}
+.dtab-wave{font-family:var(--f1);font-size:22px;font-weight:900;color:#fff;line-height:1;margin-bottom:1px}
+.dtab-wind{font-size:11px;color:var(--muted)}
+.dtab-bar{width:36px;height:4px;border-radius:2px;margin:6px auto 0}
+.dtab-date{font-size:10px;color:var(--dim);margin-top:3px;font-family:var(--f1)}
+
+/* ══ LAYOUT ══ */
+#wrap{max-width:1260px;margin:0 auto;padding:20px 16px;display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+@media(max-width:880px){#wrap{grid-template-columns:1fr}}
+
+/* ══ CARDS ══ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;animation:fadeUp .4s ease both}
+.card-hd{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-ttl{font-family:var(--f1);font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.card-sub{font-size:11px;color:var(--dim);font-family:var(--f1)}
+.card-bd{padding:0}
+
+/* ══ HOUR TABLE ══ */
+.htable{width:100%;border-collapse:collapse}
+.htable th{
+  font-family:var(--f1);font-size:11px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);
+  padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+.htable td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+.htable tr:last-child td{border-bottom:none}
+.htable tr:hover td{background:rgba(255,255,255,.025)}
+.htable tr.now td{background:rgba(0,200,255,.05)}
+.htable tr.now td:first-child{border-left:2px solid var(--acc);padding-left:12px}
+.ht-time{font-family:var(--f1);font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}
+.ht-now-tag{font-size:10px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:1px}
+.wave-big{font-family:var(--f1);font-size:26px;font-weight:900;color:#fff;line-height:1}
+.wave-big span{font-size:13px;font-weight:400;color:var(--muted)}
+.ht-ws{font-family:var(--f1);font-size:18px;font-weight:700;color:var(--text)}
+.ht-ws span{font-size:11px;color:var(--muted);font-weight:400}
+.ht-wd{font-size:12px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:4px}
+.arr{display:inline-block;font-size:14px}
+.pill{display:inline-block;padding:3px 11px;border-radius:10px;font-family:var(--f1);font-size:12px;font-weight:800;letter-spacing:.06em;white-space:nowrap}
+/* weather cells */
+.ht-temp{font-family:var(--f1);font-size:16px;font-weight:700;color:var(--text)}
+.ht-sky{font-size:18px}
+.ht-rain{font-size:12px;color:#68b4e8}
+.ht-pressure{font-size:12px;color:var(--muted);font-family:var(--f1)}
+
+/* ══ WIND MINI CHART ══ */
+.wind-bars{display:flex;gap:3px;align-items:flex-end;height:64px;padding:0 18px 12px}
+.wb-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.wb-val{font-size:9px;color:var(--muted);font-family:var(--f1);font-weight:600;text-align:center}
+.wb-bg{width:100%;flex:1;background:rgba(255,255,255,.05);border-radius:2px 2px 0 0;position:relative;overflow:hidden}
+.wb-fill{position:absolute;bottom:0;left:0;right:0;border-radius:2px 2px 0 0;transition:height .5s ease}
+.wb-time{font-size:8px;color:var(--dim);font-family:var(--f1);text-align:center;white-space:nowrap}
+
+/* ══ 7-DAY SUMMARY TABLE ══ */
+.dtable{width:100%;border-collapse:collapse}
+.dtable th{font-family:var(--f1);font-size:11px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);font-weight:700}
+.dtable td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-size:14px;vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:rgba(255,255,255,.025)}
+.day-name{font-family:var(--f1);font-size:15px;font-weight:700}
+.day-date{font-size:11px;color:var(--muted)}
+
+/* ══ SIDEBAR ══ */
+.info2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px}
+.ibox{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:13px 10px;text-align:center}
+.ibox-val{font-family:var(--f1);font-size:22px;font-weight:800;color:#fff;line-height:1;margin-bottom:2px}
+.ibox-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.13em;font-family:var(--f1)}
+.compass-c{display:flex;justify-content:center;padding:12px 0 6px}
+.cond-list{padding:4px 14px 14px}
+.crow{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.crow:last-child{border-bottom:none}
+.crow-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.crow-lbl{font-family:var(--f1);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.crow-val{font-family:var(--f1);font-size:15px;font-weight:700;color:#fff}
+
+/* ══ WEATHER CARD ══ */
+.wx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px}
+.wxbox{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center}
+.wxbox-icon{font-size:22px;margin-bottom:4px}
+.wxbox-val{font-family:var(--f1);font-size:18px;font-weight:800;color:#fff;line-height:1;margin-bottom:2px}
+.wxbox-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-family:var(--f1)}
+
+/* ══ LOAD / ERR ══ */
+.load-c{display:flex;flex-direction:column;align-items:center;padding:52px 20px;gap:12px}
+.spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+.load-txt{font-family:var(--f1);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.err-wrap{padding:30px;text-align:center;color:var(--red);font-family:var(--f1);font-size:14px}
+.err-wrap small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+
+footer{text-align:center;padding:28px 16px;color:var(--dim);font-size:11px;letter-spacing:.1em;border-top:1px solid var(--border);font-family:var(--f1)}
+footer a{color:var(--muted);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">VÅG<em>AGENTEN</em></div>
+  <div class="spot-tabs">
+    <button class="stab on" id="tab0" onclick="switchSpot(0)">RINGENÄS</button>
+    <button class="stab"    id="tab1" onclick="switchSpot(1)">TYLÖSAND</button>
+  </div>
+  <div class="live-badge"><div class="live-dot"></div>SMHI LIVE</div>
+</nav>
+
+<div id="hero">
+  <div class="hero-row">
+    <div class="hero-left">
+      <div class="spot-name" id="heroName">RINGENÄS</div>
+      <div class="spot-meta" id="heroMeta"></div>
+    </div>
+    <div class="hero-right">
+      <div class="rating-wrap">
+        <div class="rating-cap">Förhållanden nu</div>
+        <div class="stars" id="heroStars"></div>
+        <div class="rating-word" id="heroWord"></div>
+      </div>
+    </div>
+  </div>
+  <div class="now-stats" id="nowStats"></div>
+  <div style="height:16px"></div>
+  <div id="daystrip"></div>
+</div>
+
+<div id="wrap">
+  <div id="leftCol"></div>
+  <div id="rightCol"></div>
+</div>
+
+<footer>
+  VÅGAGENTEN · Ringenäs &amp; Tylösand · <a href="https://www.smhi.se" target="_blank">SMHI Open Data</a> · Vindbaserad våguppskattning (Beaufort) · Kontrollera alltid officiell SMHI-prognos innan du ger dig ut
+</footer>
+
+<script>
+/* ══ SPOTS ══ */
+var SPOTS=[
+  {
+    name:"Ringenäs",lat:56.71,lon:12.74,
+    desc:"Hallandskusten · Kattegatt",
+    info:"Öppen exponering mot väster, fungerar bäst vid V-NV-vind. Klippbotten i norr, sandstrand i söder."
+  },
+  {
+    name:"Tylösand",lat:56.6457,lon:12.7290,
+    desc:"Halmstad · Kattegatt · Halland",
+    info:"Sveriges kanske mest kända surfstrand. Lång sandbotten, bra vid V-vindvågor 10–15 m/s."
+  }
+];
+
+/* ══ UTILS ══ */
+function wh(ws){
+  if(ws<1)return 0;if(ws<3)return .1;if(ws<5)return .2;
+  if(ws<8)return .5;if(ws<11)return 1;if(ws<14)return 1.5;
+  if(ws<17)return 2.5;if(ws<21)return 3.5;return 5;
+}
+function sc(wv){if(wv<.3)return 1;if(wv<.8)return 2;if(wv<1.5)return 3;if(wv<2.5)return 4;return 5;}
+var SC_COL=["","#1fdb78","#1fdb78","#f5c53a","#ff7b2e","#ff3535"];
+var SC_WRD=["","FLAT","BRA","OKEJ","TUFFT","STORM"];
+var SC_LBL=["","Perfekt flat","Bra förhållanden","Okej","Krävande","Stormigt"];
+function d2c(d){d=((d%360)+360)%360;return["N","NNO","NO","ONO","O","OSO","SO","SSO","S","SSV","SV","VSV","V","VNV","NV","NNV"][Math.round(d/22.5)%16];}
+function deg2arrow(d){return'<span class="arr" style="display:inline-block;transform:rotate('+(d+180)+'deg)">↑</span>';}
+function pill(s){var c=SC_COL[s];return'<span class="pill" style="background:'+c+'22;color:'+c+'">'+SC_WRD[s]+'</span>';}
+function stars(s){
+  var h='';
+  for(var i=1;i<=5;i++)h+='<svg class="star-svg" viewBox="0 0 20 20"><polygon points="10,1 13,7 19,7.6 14.5,12 16,18.5 10,15 4,18.5 5.5,12 1,7.6 7,7" fill="'+(i<=s?SC_COL[s]:'#1e2e42')+'"/></svg>';
+  return h;
+}
+function compass(deg){
+  var a=parseFloat(deg)||0;
+  var lbs=[["N",0],["Ö",90],["S",180],["V",270]];
+  var t=lbs.map(function(p){
+    var r=(p[1]-90)*Math.PI/180,x=50+38*Math.cos(r),y=50+38*Math.sin(r);
+    return'<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#5f7d99" font-family="Barlow Condensed,sans-serif" font-weight="700">'+p[0]+'</text>';
+  }).join("");
+  return'<svg width="110" height="110" viewBox="0 0 100 100">'
+    +'<circle cx="50" cy="50" r="47" stroke="#1e2e42" stroke-width="1" fill="none"/>'
+    +'<circle cx="50" cy="50" r="32" stroke="#162030" stroke-width="1" fill="none"/>'
+    +t
+    +'<g transform="rotate('+a+',50,50)">'
+    +'<polygon points="50,6 55,50 50,62 45,50" fill="#00c8ff" opacity=".95"/>'
+    +'<polygon points="50,62 55,50 50,94 45,50" fill="#1a3a5c" opacity=".8"/>'
+    +'</g>'
+    +'<circle cx="50" cy="50" r="5" fill="#00c8ff" opacity=".6"/>'
+    +'</svg>';
+}
+/* sky icon from SMHI Wsymb2 */
+function skyIcon(ws2){
+  if(!ws2&&ws2!==0)return'🌤';
+  if(ws2<=2)return'☀️';
+  if(ws2<=5)return'⛅';
+  if(ws2<=7)return'🌥';
+  if(ws2<=10)return'☁️';
+  if(ws2<=12)return'🌧';
+  if(ws2<=16)return'🌨';
+  if(ws2<=18)return'⛈';
+  return'🌩';
+}
+function skyText(ws2){
+  if(!ws2&&ws2!==0)return'–';
+  if(ws2<=2)return'Klart';if(ws2<=5)return'Halvklart';
+  if(ws2<=7)return'Mulet';if(ws2<=10)return'Övermol.';
+  if(ws2<=12)return'Regn';if(ws2<=16)return'Snö';
+  if(ws2<=18)return'Åska';return'Storm';
+}
+function tempColor(t){
+  if(t>=20)return'#ff7b2e';if(t>=14)return'#f5c53a';
+  if(t>=8)return'#1fdb78';if(t>=2)return'#68b4e8';return'#a0c4ff';
+}
+
+/* ══ STATE ══ */
+var cache={};
+var selIdx=0;
+var selDay=0;
+
+/* ══ SWITCH SPOT ══ */
+function switchSpot(i){
+  selIdx=i;selDay=0;
+  document.getElementById("tab0").classList.toggle("on",i===0);
+  document.getElementById("tab1").classList.toggle("on",i===1);
+  var sp=SPOTS[i];
+  if(cache[sp.name])renderAll(cache[sp.name],sp);
+  else{showLoading();fetchData(sp);}
+}
+
+/* ══ FETCH ══ */
+function fetchData(sp){
+  var url="https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/"
+    +sp.lon.toFixed(6)+"/lat/"+sp.lat.toFixed(6)+"/data.json";
+  fetch(url)
+  .then(function(r){if(!r.ok)throw new Error("SMHI HTTP "+r.status);return r.json();})
+  .then(function(j){
+    var d=parse(j);
+    cache[sp.name]=d;
+    if(SPOTS[selIdx].name===sp.name)renderAll(d,sp);
+  })
+  .catch(function(e){showErr(e.message);});
+}
+
+/* ══ PARSE ══ */
+function parse(json){
+  var series=json.timeSeries||[];
+  var now=new Date();
+  var moments=series.map(function(ts){
+    var t=new Date(ts.validTime);
+    var p={};ts.parameters.forEach(function(x){p[x.name]=x.values[0];});
+    var ws=p.ws||0,wd=p.wd||0,gust=p.gust||ws;
+    var t2=p.t||null,vis=p.vis||null,tcc=p.tcc_mean||null,spp=p.spp||-9,pmean=p.pmean||0;
+    var wsymb=p.Wsymb2||null;
+    return{time:t,ws:ws,wd:wd,gust:gust,wv:wh(ws),
+           temp:t2,vis:vis,cloud:tcc,wsymb:wsymb,
+           precip:pmean>=0?pmean:0};
+  });
+  var cur=moments[0];
+  for(var i=0;i<moments.length;i++){if(moments[i].time>=now){cur=moments[i];break;}}
+
+  /* group by local date */
+  var dayMap={};
+  moments.forEach(function(m){
+    var k=m.time.toLocaleDateString("sv-SE");
+    if(!dayMap[k])dayMap[k]={date:m.time,moments:[]};
+    dayMap[k].moments.push(m);
+  });
+  var days=Object.keys(dayMap).slice(0,7).map(function(k,i){
+    var ms=dayMap[k].moments;
+    var maxWv=Math.max.apply(null,ms.map(function(x){return x.wv;}));
+    var maxWs=Math.max.apply(null,ms.map(function(x){return x.ws;}));
+    var minT=Math.min.apply(null,ms.filter(function(x){return x.temp!==null;}).map(function(x){return x.temp;}));
+    var maxT=Math.max.apply(null,ms.filter(function(x){return x.temp!==null;}).map(function(x){return x.temp;}));
+    var totR=ms.reduce(function(s,x){return s+(x.precip||0);},0);
+    var peak=ms.reduce(function(b,c){return c.ws>b.ws?c:b;},ms[0]);
+    /* noon moment for sky icon */
+    var noon=ms.find(function(m){return m.time.getHours()===12;})||ms[Math.floor(ms.length/2)];
+    var d=dayMap[k].date;
+    return{
+      date:d,moments:ms,maxWv:maxWv,maxWs:maxWs,
+      minT:isFinite(minT)?minT:null,maxT:isFinite(maxT)?maxT:null,
+      totalRain:totR,peak:peak,noon:noon,
+      label:i===0?"Idag":i===1?"Imorgon":d.toLocaleDateString("sv-SE",{weekday:"short"}).toUpperCase(),
+      dateStr:d.toLocaleDateString("sv-SE",{month:"short",day:"numeric"}),
+    };
+  });
+  return{current:cur,days:days,now:now};
+}
+
+/* ══ RENDER ALL ══ */
+function renderAll(d,sp){
+  renderHero(d,sp);
+  renderDayStrip(d);
+  renderLeft(d,sp);
+  renderRight(d,sp);
+}
+
+/* ══ HERO ══ */
+function renderHero(d,sp){
+  document.getElementById("heroName").textContent=sp.name.toUpperCase();
+  document.getElementById("heroMeta").innerHTML='<b>'+sp.desc+'</b> · '+sp.lat+'°N '+sp.lon+'°Ö';
+  var s=sc(d.current.wv);
+  document.getElementById("heroStars").innerHTML=stars(s);
+  document.getElementById("heroWord").textContent=SC_LBL[s];
+  document.getElementById("heroWord").style.color=SC_COL[s];
+
+  var tempStr=d.current.temp!==null?'<div class="nstat"><div class="nstat-val" style="color:'+tempColor(d.current.temp)+'">'+d.current.temp.toFixed(0)+'°</div><div class="nstat-lbl">Temp</div></div>':'';
+  var rainStr=d.current.precip>0?'<div class="nstat"><div class="nstat-val" style="color:#68b4e8">'+d.current.precip.toFixed(1)+'</div><div class="nstat-lbl">mm/h</div></div>':'';
+  document.getElementById("nowStats").innerHTML=
+    '<div class="nstat"><div class="nstat-val">~'+d.current.wv.toFixed(1)+'m</div><div class="nstat-lbl">Våghöjd</div></div>'
+    +'<div class="nstat"><div class="nstat-val">'+d.current.ws.toFixed(1)+'</div><div class="nstat-lbl">m/s vind</div></div>'
+    +'<div class="nstat"><div class="nstat-val">'+d.current.gust.toFixed(1)+'</div><div class="nstat-lbl">m/s byar</div></div>'
+    +'<div class="nstat"><div class="nstat-val">'+Math.round(d.current.wd)+'°</div><div class="nstat-lbl">'+d2c(d.current.wd)+'</div></div>'
+    +tempStr+rainStr
+    +(d.current.wsymb!==null?'<div class="nstat"><div class="nstat-val">'+skyIcon(d.current.wsymb)+'</div><div class="nstat-lbl">'+skyText(d.current.wsymb)+'</div></div>':'');
+}
+
+/* ══ DAYSTRIP ══ */
+function renderDayStrip(d){
+  document.getElementById("daystrip").innerHTML=d.days.map(function(day,i){
+    var s=sc(day.maxWv);var c=SC_COL[s];
+    var tStr=(day.maxT!==null&&day.minT!==null)?day.minT.toFixed(0)+'–'+day.maxT.toFixed(0)+'°':'';
+    return'<div class="dtab'+(i===selDay?" on":"")+'" onclick="selDay='+i+';reRender()">'
+      +'<div class="dtab-name">'+day.label+'</div>'
+      +'<div class="dtab-wave">'+day.maxWv.toFixed(1)+'<span style="font-size:11px;color:var(--muted)">m</span></div>'
+      +'<div class="dtab-wind">'+day.maxWs.toFixed(0)+' m/s</div>'
+      +'<div class="dtab-date">'+day.dateStr+(tStr?' · '+tStr:'')+'</div>'
+      +'<div class="dtab-bar" style="background:'+c+'"></div>'
+      +'</div>';
+  }).join("");
+}
+
+/* ══ LEFT COL ══ */
+function renderLeft(d,sp){
+  var lc=document.getElementById("leftCol");
+  lc.innerHTML='';
+
+  /* — HOUR TABLE — */
+  var day=d.days[selDay]||d.days[0];
+  var ms=day.moments;
+  var now=d.now;
+  /* show every other hour (up to 24 rows) */
+  var show=[];
+  for(var i=0;i<ms.length;i++){if(i%2===0||ms.length<=12)show.push(ms[i]);}
+  if(show.length>12)show=show.slice(0,12);
+  var nowIdx=-1;
+  show.forEach(function(m,i){if(nowIdx<0&&m.time>=now)nowIdx=i;});
+
+  var rows=show.map(function(m,i){
+    var s=sc(m.wv);var c=SC_COL[s];
+    var isNow=(i===nowIdx);
+    var tStr=m.time.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit"});
+    var tempCell=m.temp!==null?'<td class="ht-temp" style="color:'+tempColor(m.temp)+'">'+m.temp.toFixed(0)+'°</td>':'<td style="color:var(--dim)">—</td>';
+    var skyCell=m.wsymb!==null?'<td><span class="ht-sky">'+skyIcon(m.wsymb)+'</span></td>':'<td>—</td>';
+    var rainCell=m.precip>0?'<td class="ht-rain">'+m.precip.toFixed(1)+'mm</td>':'<td style="color:var(--dim)">—</td>';
+    return'<tr class="'+(isNow?"now":"")+'">'
+      +'<td><div class="ht-time">'+(isNow?'<span style="color:var(--acc);font-size:10px;display:block;letter-spacing:.1em">▶ NU</span>':'')+tStr+'</div></td>'
+      +'<td><div class="wave-big">~'+m.wv.toFixed(1)+'<span>m</span></div></td>'
+      +'<td><div class="ht-ws">'+m.ws.toFixed(1)+'<span> m/s</span></div>'
+        +'<div class="ht-wd">'+deg2arrow(m.wd)+' '+Math.round(m.wd)+'° '+d2c(m.wd)+'</div></td>'
+      +'<td><div class="ht-ws">'+m.gust.toFixed(1)+'<span> m/s</span></div></td>'
+      +skyCell
+      +tempCell
+      +rainCell
+      +'<td>'+pill(s)+'</td>'
+      +'</tr>';
+  }).join("");
+
+  var htCard=document.createElement("div");
+  htCard.className="card";
+  htCard.innerHTML='<div class="card-hd"><span class="card-ttl">Timprognos · '+day.label+'</span>'
+    +'<span class="card-sub">Uppdaterad '+d.now.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit"})+'</span></div>'
+    +'<div class="card-bd"><div style="overflow-x:auto">'
+    +'<table class="htable"><thead><tr>'
+    +'<th>TID</th><th>VÅGHÖJD</th><th>VIND</th><th>BYAR</th><th>VÄD.</th><th>TEMP</th><th>REGN</th><th>STATUS</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+  lc.appendChild(htCard);
+
+  /* — WIND CHART — */
+  var wcCard=document.createElement("div");
+  wcCard.className="card";
+  var maxWs2=Math.max.apply(null,ms.map(function(x){return x.ws;}));
+  if(maxWs2<1)maxWs2=1;
+  var step2=Math.max(1,Math.floor(ms.length/18));
+  var wshow=[];for(var j=0;j<ms.length&&wshow.length<18;j+=step2)wshow.push(ms[j]);
+  var wbars=wshow.map(function(m){
+    var pct=(m.ws/maxWs2*100).toFixed(0);
+    var c2=SC_COL[sc(m.wv)];
+    var lbl=m.time.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit"});
+    return'<div class="wb-wrap">'
+      +'<div class="wb-val">'+m.ws.toFixed(0)+'</div>'
+      +'<div class="wb-bg"><div class="wb-fill" style="height:'+pct+'%;background:'+c2+'"></div></div>'
+      +'<div class="wb-time">'+lbl+'</div></div>';
+  }).join("");
+  wcCard.innerHTML='<div class="card-hd"><span class="card-ttl">Vindprofil · '+day.label+'</span>'
+    +'<span class="card-sub">m/s per timme</span></div>'
+    +'<div class="card-bd"><div class="wind-bars">'+wbars+'</div></div>';
+  lc.appendChild(wcCard);
+
+  /* — 7-DAY SUMMARY — */
+  var dayCard=document.createElement("div");
+  dayCard.className="card";
+  var drows=d.days.map(function(day2,i){
+    var s2=sc(day2.maxWv);var c2=SC_COL[s2];
+    var tStr2=(day2.maxT!==null&&day2.minT!==null)?day2.minT.toFixed(0)+'–'+day2.maxT.toFixed(0)+'°':'—';
+    var rainStr2=day2.totalRain>0.1?day2.totalRain.toFixed(1)+' mm':'Torrt';
+    return'<tr'+(i===selDay?' style="background:rgba(0,200,255,.05)"':'')+'>'
+      +'<td><div class="day-name">'+day2.label+'</div><div class="day-date">'+day2.dateStr+'</div></td>'
+      +'<td><div class="wave-big" style="font-size:20px">~'+day2.maxWv.toFixed(1)+'<span>m</span></div></td>'
+      +'<td><div class="ht-ws">'+day2.maxWs.toFixed(0)+'<span> m/s</span></div>'
+        +'<div class="ht-wd">'+d2c(day2.peak.wd)+'</div></td>'
+      +'<td><span style="font-size:20px">'+skyIcon(day2.noon?day2.noon.wsymb:null)+'</span></td>'
+      +'<td style="color:'+tempColor((day2.maxT||10))+'">'+tStr2+'</td>'
+      +'<td style="color:#68b4e8">'+rainStr2+'</td>'
+      +'<td>'+pill(s2)+'</td>'
+      +'</tr>';
+  }).join("");
+  dayCard.innerHTML='<div class="card-hd"><span class="card-ttl">7-dagars översikt</span>'
+    +'<span class="card-sub">Max per dag</span></div>'
+    +'<div class="card-bd"><div style="overflow-x:auto">'
+    +'<table class="dtable"><thead><tr>'
+    +'<th>DAG</th><th>VÅGOR</th><th>VIND</th><th>VÄD.</th><th>TEMP</th><th>REGN</th><th>STATUS</th>'
+    +'</tr></thead><tbody>'+drows+'</tbody></table></div></div>';
+  lc.appendChild(dayCard);
+
+  /* — SPOT INFO — */
+  var infoCard=document.createElement("div");
+  infoCard.className="card";
+  infoCard.innerHTML='<div class="card-hd"><span class="card-ttl">Om '+sp.name+'</span></div>'
+    +'<div class="card-bd" style="padding:16px 18px">'
+    +'<p style="font-size:13px;color:var(--muted);line-height:1.8">'+sp.info+'</p>'
+    +'<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'
+    +'<span style="font-size:11px;background:var(--bg3);border:1px solid var(--border);padding:3px 10px;border-radius:12px;color:var(--muted);font-family:var(--f1);letter-spacing:.08em">📍 '+sp.lat+'°N '+sp.lon+'°Ö</span>'
+    +'<span style="font-size:11px;background:var(--bg3);border:1px solid var(--border);padding:3px 10px;border-radius:12px;color:var(--muted);font-family:var(--f1);letter-spacing:.08em">🌊 Kattegatt</span>'
+    +'<span style="font-size:11px;background:var(--bg3);border:1px solid var(--border);padding:3px 10px;border-radius:12px;color:var(--muted);font-family:var(--f1);letter-spacing:.08em">🏄 Hallandskusten</span>'
+    +'</div></div>';
+  lc.appendChild(infoCard);
+}
+
+/* ══ RIGHT COL ══ */
+function renderRight(d,sp){
+  var rc=document.getElementById("rightCol");
+  rc.innerHTML='';
+
+  var day=d.days[selDay]||d.days[0];
+  var cur=(selDay===0)?d.current:day.peak;
+  var s=sc(cur.wv);var c=SC_COL[s];
+
+  /* — NOW CARD — */
+  var nowCard=document.createElement("div");
+  nowCard.className="card";
+  nowCard.innerHTML='<div class="card-hd"><span class="card-ttl">Nu · <span style="color:var(--acc)">'+
+    cur.time.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit"})+'</span></span></div>'
+    +'<div class="info2">'
+    +ibox("~"+cur.wv.toFixed(1)+" m","Våghöjd")
+    +ibox(cur.ws.toFixed(1)+" m/s","Vind")
+    +ibox(cur.gust.toFixed(1)+" m/s","Byar")
+    +ibox(d2c(cur.wd),"Riktning")
+    +(cur.temp!==null?ibox(cur.temp.toFixed(0)+"°","Temp"):'')
+    +(cur.precip>0?ibox(cur.precip.toFixed(1)+" mm","Regn/h"):'')
+    +'</div>'
+    +'<div class="compass-c">'+compass(cur.wd)+'</div>'
+    +'<div class="cond-list">'
+    +crow("🌊","Förhållanden",'<span style="color:'+c+';font-weight:800">'+SC_LBL[s]+'</span>')
+    +crow("💨","Vind",cur.ws.toFixed(1)+" m/s "+d2c(cur.wd))
+    +crow("🌬️","Byvindar",cur.gust.toFixed(1)+" m/s")
+    +crow("🧭","Vindriktning",Math.round(cur.wd)+"° "+d2c(cur.wd))
+    +(cur.temp!==null?crow("🌡️","Lufttemp",cur.temp.toFixed(1)+"°C"):'')
+    +(cur.wsymb!==null?crow("☁️","Väder",skyIcon(cur.wsymb)+" "+skyText(cur.wsymb)):'')
+    +(cur.precip>0?crow("🌧","Nederbörd",cur.precip.toFixed(1)+" mm/h"):'')
+    +'</div>';
+  rc.appendChild(nowCard);
+
+  /* — WEATHER CARD for selected day — */
+  var wxCard=document.createElement("div");
+  wxCard.className="card";
+  var tempRange=(day.maxT!==null&&day.minT!==null)?day.minT.toFixed(0)+'°–'+day.maxT.toFixed(0)+'°':'—';
+  wxCard.innerHTML='<div class="card-hd"><span class="card-ttl">Väder · '+day.label+'</span></div>'
+    +'<div class="wx-grid">'
+    +'<div class="wxbox"><div class="wxbox-icon">'+skyIcon(day.noon?day.noon.wsymb:null)+'</div>'
+      +'<div class="wxbox-val">'+skyText(day.noon?day.noon.wsymb:null)+'</div><div class="wxbox-lbl">Väder</div></div>'
+    +'<div class="wxbox"><div class="wxbox-icon">🌡️</div>'
+      +'<div class="wxbox-val" style="color:'+tempColor(day.maxT||10)+'">'+tempRange+'</div><div class="wxbox-lbl">Temp</div></div>'
+    +'<div class="wxbox"><div class="wxbox-icon">🌧</div>'
+      +'<div class="wxbox-val" style="color:#68b4e8">'+(day.totalRain>.1?day.totalRain.toFixed(1)+' mm':'Torrt')+'</div><div class="wxbox-lbl">Regn</div></div>'
+    +'<div class="wxbox"><div class="wxbox-icon">💨</div>'
+      +'<div class="wxbox-val">'+day.maxWs.toFixed(0)+' m/s</div><div class="wxbox-lbl">Max vind</div></div>'
+    +'<div class="wxbox"><div class="wxbox-icon">🌊</div>'
+      +'<div class="wxbox-val" style="color:'+SC_COL[sc(day.maxWv)]+'">'+day.maxWv.toFixed(1)+' m</div><div class="wxbox-lbl">Max vågor</div></div>'
+    +'<div class="wxbox"><div class="wxbox-icon">🧭</div>'
+      +'<div class="wxbox-val">'+d2c(day.peak.wd)+'</div><div class="wxbox-lbl">Vindrikt.</div></div>'
+    +'</div>';
+  rc.appendChild(wxCard);
+
+  /* — TIPS CARD — */
+  var tipsCard=document.createElement("div");
+  tipsCard.className="card";
+  var tipText=makeTip(sc(day.maxWv),day.peak.wd,day.maxWs,sp);
+  tipsCard.innerHTML='<div class="card-hd"><span class="card-ttl">Surfguide · '+day.label+'</span></div>'
+    +'<div class="card-bd" style="padding:14px 16px">'
+    +'<p style="font-size:13px;color:var(--muted);line-height:1.85">'+tipText+'</p></div>';
+  rc.appendChild(tipsCard);
+}
+
+function makeTip(s,wd,ws,sp){
+  var wdir=d2c(wd);
+  var tips="";
+  if(s===1)tips="Ingenting just nu — totalt flat. Perfekt dag för longboard-träning i shorebreaket eller att wax:a brädan.";
+  else if(s===2)tips="Bra förhållanden! "+wdir+"-vind skapar ridbar surf. Rekommenderas för intermediärsurfare och uppåt.";
+  else if(s===3)tips="Okejförhållanden med "+ws.toFixed(0)+" m/s från "+wdir+". Lite stökigt men ridbart. Erfarna surfare och kiter kan ha kul.";
+  else if(s===4)tips="Tuffa förhållanden — "+ws.toFixed(0)+" m/s från "+wdir+". Avsett för erfarna surfare. Kiter och windsurfare kan trivas.";
+  else tips="⚠️ Stormvarning. "+ws.toFixed(0)+" m/s från "+wdir+". Håll dig på stranden om du inte är expert. Kontrollera SMHI:s officiella varningar.";
+  return tips;
+}
+
+function ibox(v,l){return'<div class="ibox"><div class="ibox-val">'+v+'</div><div class="ibox-lbl">'+l+'</div></div>';}
+function crow(ic,l,v){return'<div class="crow"><div class="crow-icon">'+ic+'</div><div><div class="crow-lbl">'+l+'</div><div class="crow-val">'+v+'</div></div></div>';}
+
+/* ══ RE-RENDER on day change ══ */
+function reRender(){
+  var sp=SPOTS[selIdx];
+  var d=cache[sp.name];
+  if(!d)return;
+  renderDayStrip(d);
+  renderLeft(d,sp);
+  renderRight(d,sp);
+}
+
+function showLoading(){
+  document.getElementById("leftCol").innerHTML='<div class="card"><div class="load-c"><div class="spinner"></div><div class="load-txt">Hämtar SMHI-data…</div></div></div>';
+  document.getElementById("rightCol").innerHTML='';
+  document.getElementById("daystrip").innerHTML='';
+  document.getElementById("nowStats").innerHTML='';
+  document.getElementById("heroStars").innerHTML='';
+  document.getElementById("heroWord").textContent='';
+}
+function showErr(msg){
+  document.getElementById("leftCol").innerHTML='<div class="card"><div class="err-wrap">⚠ Kunde inte hämta data<small>'+msg+'</small></div></div>';
+}
+
+/* ══ BOOT — load both spots silently, show first ══ */
+switchSpot(0);
+setTimeout(function(){var sp=SPOTS[1];if(!cache[sp.name])fetchData(sp);},1500);
+</script>
+</body>
+</html>
